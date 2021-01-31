@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 // import Icon from 'react-native-vector-icons/FontAwesome';
+import LocationSearch from '../pages/locationSearch';
 import Map from '../pages/map';
 import Bookmarks from '../pages/bookmarks';
 import Home from '../pages';
@@ -52,6 +53,11 @@ function AppWeatherNavigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
+      <Stack.Screen 
+          name="LocationSearch" 
+          component={LocationSearch} 
+          options={{header: () => null}}
+        />
         <Stack.Screen 
           name="Home" 
           component={Home} 

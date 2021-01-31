@@ -22,7 +22,8 @@ const mapStateToProps = (state) => {
 const styles = StyleSheet.create({
     container: {
       paddingTop: Platform.OS === 'ios' ? 19 : 10,
-      backgroundColor: "white"
+      backgroundColor: "#ffffff", 
+      flex: 1
     },
     imageStyle: {
         height: 150, 
