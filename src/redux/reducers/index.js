@@ -1,6 +1,6 @@
 import { combineReducers } from  'redux';
-import aldel from './aldel';
+import locationDataReducer from './locationDataReducer';
 
 export default combineReducers({
-    aldel: aldel,
+    locationData: locationDataReducer
 });

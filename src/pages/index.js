@@ -15,7 +15,7 @@ function Home(props) {
 
 const mapStateToProps = (state) => {
     return {
-        aldel: state.aldel,
+        locationData: state.locationData,
     }
 }
 

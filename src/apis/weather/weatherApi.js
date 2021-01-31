@@ -1,20 +1,17 @@
 
-import API from '../url';
+// import API from '../url';
+const API_WEATHER = "https://api.openweathermap.org/data/2.5/onecall?";
 
 class Api {
 
-    async logIn(email, password) {
+    async getLocationData(data) {
         const conf = {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
             timeout: 30000,
-            body: JSON.stringify({
-                email: email,
-                password: password
-            }),
         }
 
         function checkStatus(response) {
@@ -32,10 +29,10 @@ class Api {
 
         var query = {}
 
-        console.log('url',`${API}login`)
+        console.log('url',`${API_WEATHER}lat=${data.lat}&lon=${data.lon}&units=${data.units}&exclude=minutely&appid=b6300e8af9a1e6410ed108a67cedb25e`)
         console.log('conf', conf)
  
-        await fetch(`${API}login`, conf)
+        await fetch(`${API_WEATHER}lat=${data.lat}&lon=${data.lon}&units=${data.units}&exclude=minutely&appid=b6300e8af9a1e6410ed108a67cedb25e`, conf)
             .then(checkStatus)
             .then(parseJSON)
             .then(function (data) {
