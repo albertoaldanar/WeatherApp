@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import { Alert, View, Text, TouchableOpacity, Platform, StyleSheet, Image } from "react-native";
 import { connect } from "react-redux";
-// import Geocoder from 'react-native-geocoding';
+import Geocoder from 'react-native-geocoding';
 import Geolocation from 'react-native-geolocation-service';
 //local imports
 import LocationGif from '../assets/location.gif';
@@ -18,7 +18,7 @@ function LocationSearch(props) {
 
         async function getCurrentPosition(){
 
-            const { changeLocationState, locationData } = props;
+            const { changeLocationState } = props;
 
             Geolocation.getCurrentPosition(
                 (position) => {
@@ -27,10 +27,10 @@ function LocationSearch(props) {
 
                     changeLocationState({
                         lat: position.coords.latitude,
-                        lon: position.coords.latitude
+                        lon: position.coords.longitude
                     })
 
-                    getLocationWeather(locationData);
+                    getLocationName(position.coords.latitude, position.coords.longitude);
                 }, (error) => {
                     console.log(error)
                 }
@@ -53,6 +53,7 @@ function LocationSearch(props) {
                     });
 
                    props.navigation.navigate("Home");
+                   
                 } else {
                     alert("error")
                     console.log("error!")
@@ -73,6 +74,35 @@ function LocationSearch(props) {
                     }
                 }
             }
+        }
+
+        async function getLocationName(lat, lon){
+
+            const { changeLocationState, locationData } = props;
+
+            Geocoder.init('AIzaSyCpU3x_xDHxgw-lzjj1AyOpL8Ww3CamaHs'); // use a valid API key
+            Geocoder.from(lat, lon).then(json => {
+
+                var addressComponent = json.results[0].address_components;
+                var city = "";
+                var country = "";
+
+                for (var obj of addressComponent) {
+
+                    if (obj.types[0] == "country" || obj.types[0] == "political") {
+                        country = obj.long_name
+                    } else if (obj.types[0] == "locality") {
+                        city = obj.long_name
+                    }
+                }
+
+                changeLocationState({
+                    city: city + ", " + country
+                });
+
+                getLocationWeather(locationData);
+
+            });
         }
 
         console.log("props => ", props.locationData);
