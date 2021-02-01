@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import { Alert, View, Text, TouchableOpacity, Platform, StyleSheet, Image } from "react-native";
+import { Alert, Image , PermissionsAndroid, Platform, StyleSheet, Text, TouchableOpacity, View  } from "react-native";
 import { connect } from "react-redux";
 import Geocoder from 'react-native-geocoding';
 import Geolocation from 'react-native-geolocation-service';
@@ -12,12 +12,34 @@ function LocationSearch(props) {
 
         useEffect(() => {
             setTimeout(() => {
-                getCurrentPosition();
+                getPermissions();
             },  2000)
         }, []);
 
-        async function getCurrentPosition(){
+        async function getPermissions(){
 
+            if(Platform.OS == "android"){
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                    {
+                        'title': 'Location permissions',
+                        'message': 'WeatherApp wants to access your location.',
+                        buttonPositive: "OK"
+                    }
+                )
+    
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    getCurrentPosition();
+                } else {
+                    alert("No permissions")
+                }
+                
+            } else {
+                getCurrentPosition();
+            }
+        }
+
+        async function getCurrentPosition(){
             const { changeLocationState } = props;
 
             Geolocation.getCurrentPosition(
@@ -47,7 +69,7 @@ function LocationSearch(props) {
     
                 if (weatherResponse.current) {
                     changeLocationState({
-                        hourlyData: weatherResponse.hourly, 
+                        hourlyData: weatherResponse.hourly.slice(0, 25), 
                         dailyData: weatherResponse.daily, 
                         currentMainData: weatherResponse.current 
                     });

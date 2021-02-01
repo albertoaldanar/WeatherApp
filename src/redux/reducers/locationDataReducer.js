@@ -4,7 +4,7 @@ const initialState = {
   lat: 0, 
   lon: 0, 
   city: "", 
-  units: "metrics",
+  units: "metric",
   currentMainData: {
 
   },

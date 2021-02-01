@@ -6,7 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LocationSearch from '../pages/locationSearch';
 import Map from '../pages/map';
 import Bookmarks from '../pages/bookmarks';
-import Home from '../pages';
+import Home from '../pages/home';
 import CityDescription from '../pages/cityDescription';
 
 const Tab = createBottomTabNavigator();
