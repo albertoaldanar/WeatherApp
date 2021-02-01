@@ -4,7 +4,6 @@ import { View, Text, TouchableOpacity, Platform, StyleSheet, Image } from "react
 import BookMark from '../../../assets/bookmark.png'
 
 function NoBookmarks(props) {
-        console.log(props);
 
         return(
             <View style = {styles.container}>
@@ -22,7 +21,7 @@ const styles = StyleSheet.create({
     }, 
     imageStyle: {
         marginTop: "30%", 
-        width: 250, height: 250
+        width: 200, height: 200
     }, 
     text: {
         marginTop: 25, color: "gray", fontSize: 18 

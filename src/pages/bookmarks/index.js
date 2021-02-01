@@ -1,14 +1,14 @@
 import React, {useState} from "react";
 import { View, Text, TouchableOpacity, Platform, StyleSheet, Image, ScrollView } from "react-native";
+import { connect } from "react-redux";
 import Icon from 'react-native-vector-icons/FontAwesome';
 //local imports
 import BookmarksList from './designComponents/bookmarksList';
 import BookmarHeader from './designComponents/bookmarksHeader';
 import NoBookmarks from './designComponents/noBookmarks';
+import setBookmarksList from '../../redux/actions/bookmarksActions';
 
 function Bookmarks(props) {
-
-        console.log("propssss", props);
 
         const bookmarks = [
             {
@@ -28,11 +28,14 @@ function Bookmarks(props) {
             }
         ]
 
+
+        const { bookmarksData } = props;
+
         return(
             <View style = {styles.container}>
                 <BookmarHeader {...props}/>
                 {
-                    bookmarks.length > 0 ? 
+                    bookmarksData.length > 0 ? 
                         <BookmarksList bookmarks = {bookmarks}/>
                     : 
                         <NoBookmarks />
@@ -93,4 +96,16 @@ const styles = StyleSheet.create({
 
 });
 
-export default Bookmarks;
+
+const mapStateToProps = (state) => {
+    return {
+        bookmarksData: state.bookmarksData,
+    }
+}
+
+const mapDispatchToProps = dispatch => ({
+    setBookmarksList: (object) => dispatch(setBookmarksList(object)),
+});
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(Bookmarks);
