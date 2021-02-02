@@ -1,4 +1,4 @@
-import { SET_SELECTED_CITY } from "../actions/locationDataActions";
+import { SET_SELECTED_CITY } from "../actions/selectedCityActions";
 
 const initialState = {
   lat: 0, 
@@ -7,13 +7,7 @@ const initialState = {
   units: "metric",
   currentMainData: {
     
-  },
-  hourlyData: [
-
-  ],
-  dailyData: [
-    
-  ], 
+  }
 }
 
 export default function(state = initialState, action) {

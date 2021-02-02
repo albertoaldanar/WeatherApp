@@ -35,13 +35,19 @@ function LocationSearch(props) {
                 }
                 
             } else {
-                getCurrentPosition();
+                // getCurrentPosition();
+                changeLocationState({
+                    lat: 23.2267,
+                    lon: -106.408
+                })
+
+                getLocationName(23.2267, -106.408);
             }
         }
 
         async function getCurrentPosition(){
             const { changeLocationState } = props;
-
+           
             Geolocation.getCurrentPosition(
                 (position) => {
 

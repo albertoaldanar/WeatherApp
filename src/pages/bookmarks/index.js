@@ -10,37 +10,20 @@ import NoBookmarks from './designComponents/noBookmarks';
 import setBookmarksList from '../../redux/actions/bookmarksActions';
 import firebaseConfig from '../../firebase/firebaseConfig';
 
-
 function Bookmarks(props) {
-
-            const bookmarks = [
-            {
-                city: "Mexico", 
-                temp: 20, 
-                humidity: 60
-            },
-            {
-                city: "Monterrey", 
-                temp: 10, 
-                humidity: 40
-            },
-            {
-                city: "India", 
-                temp: 29, 
-                humidity: 20
-            }
-        ]
 
         useEffect(() => {
             if(!firebase.apps.length){
                 firebase.initializeApp(firebaseConfig);
             }
+            
             getBookmarks();
         }, [])
 
         async function getBookmarks(){
             const { setBookmarksList } = props;
-
+            firebase.firestore().settings({ experimentalForceLongPolling: true });
+            
             const snapshot = await firebase.firestore().collection('bookmarks').get()
             var result = snapshot.docs.map(doc => doc.data())
             setBookmarksList({data: result});   
@@ -48,14 +31,14 @@ function Bookmarks(props) {
 
         const { bookmarksData } = props;
 
-        console.log("BOOKMARKS =>", bookmarksData)
+        console.log("BOOKMARKS =>", bookmarksData);
 
         return(
             <View style = {styles.container}>
                 <BookmarHeader {...props}/>
                 {
                     bookmarksData.data.length > 0 ? 
-                        <BookmarksList bookmarks = {bookmarksData}/>
+                        <BookmarksList bookmarks = {bookmarksData} {...props} />
                     : 
                         <NoBookmarks />
                 }

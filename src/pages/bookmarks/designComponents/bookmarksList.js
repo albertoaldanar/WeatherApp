@@ -3,9 +3,11 @@ import { View, Text, TouchableOpacity, Platform, StyleSheet, Image, ScrollView, 
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 function BookmarksList(props) {
-
+    
     const renderBookmark = ({ item }) => (
-        <TouchableOpacity style = {styles.cityCard}>
+        <TouchableOpacity style = {styles.cityCard} onPress = {() => props.navigation.navigate("CityDescription", {
+            data: item
+        })}>
             <Text style = {{fontSize: 18, fontWeight: "300"}}>{item.city}</Text>
             <Icon name ="arrow-right" size = {17} color = "gray"/>
         </TouchableOpacity>
