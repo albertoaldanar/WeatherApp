@@ -1,8 +1,6 @@
-import { SET_BOOKMARKS_LIST } from "../actions/locationDataActions";
+import { SET_BOOKMARKS_LIST } from "../actions/bookmarksActions";
 
-const initialState = [
-    
-]
+const initialState = {data:  []}
 
 export default function(state = initialState, action) {
     switch (action.type) {

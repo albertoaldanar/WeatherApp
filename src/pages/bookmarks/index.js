@@ -1,16 +1,19 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { View, Text, TouchableOpacity, Platform, StyleSheet, Image, ScrollView } from "react-native";
 import { connect } from "react-redux";
 import Icon from 'react-native-vector-icons/FontAwesome';
+import * as firebase from 'firebase';
 //local imports
 import BookmarksList from './designComponents/bookmarksList';
 import BookmarHeader from './designComponents/bookmarksHeader';
 import NoBookmarks from './designComponents/noBookmarks';
 import setBookmarksList from '../../redux/actions/bookmarksActions';
+import firebaseConfig from '../../firebase/firebaseConfig';
+
 
 function Bookmarks(props) {
 
-        const bookmarks = [
+            const bookmarks = [
             {
                 city: "Mexico", 
                 temp: 20, 
@@ -28,15 +31,31 @@ function Bookmarks(props) {
             }
         ]
 
+        useEffect(() => {
+            if(!firebase.apps.length){
+                firebase.initializeApp(firebaseConfig);
+            }
+            getBookmarks();
+        }, [])
+
+        async function getBookmarks(){
+            const { setBookmarksList } = props;
+
+            const snapshot = await firebase.firestore().collection('bookmarks').get()
+            var result = snapshot.docs.map(doc => doc.data())
+            setBookmarksList({data: result});   
+        }
 
         const { bookmarksData } = props;
+
+        console.log("BOOKMARKS =>", bookmarksData)
 
         return(
             <View style = {styles.container}>
                 <BookmarHeader {...props}/>
                 {
-                    bookmarksData.length > 0 ? 
-                        <BookmarksList bookmarks = {bookmarks}/>
+                    bookmarksData.data.length > 0 ? 
+                        <BookmarksList bookmarks = {bookmarksData}/>
                     : 
                         <NoBookmarks />
                 }

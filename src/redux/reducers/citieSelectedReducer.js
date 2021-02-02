@@ -6,7 +6,7 @@ const initialState = {
   city: "", 
   units: "metric",
   currentMainData: {
-
+    
   },
   hourlyData: [
 
