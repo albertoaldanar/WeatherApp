@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import { View, Text, TouchableOpacity, Platform, StyleSheet, Image } from "react-native";
+import { Alert, View, Text, TouchableOpacity, Platform, StyleSheet, Image } from "react-native";
 import { connect } from "react-redux";
 import * as firebase from 'firebase';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -12,8 +12,8 @@ import LoaderModal from '../../utils/modalLoader';
 
 function Home(props) {
 
-    const [loadingModal, setLoadingModal] = useState(false);
-    const  { locationData, changeLocationState } = props;
+    const [ loadingModal, setLoadingModal ] = useState(false);
+    const { locationData, changeLocationState } = props;
 
     async function getWeatherData() {
         setLoadingModal(true);
@@ -74,8 +74,20 @@ function Home(props) {
             lat: locationData.lat,
             lon: locationData.lon
         });
+
+        Alert.alert(
+            "Saved!",
+            "Bookmark saved correctly",
+            [
+
+              { text: "OK", onPress: () => console.log("OK Pressed") }
+            ],
+            { cancelable: false }
+          );
+      
     }   
     console.log("location => ", locationData);
+
     return(
         <View style = {styles.container}>
             <LoaderModal visibleModal={loadingModal} text={'Loading...'} />
@@ -84,7 +96,7 @@ function Home(props) {
             <LocationWeatherDesign locationData = {locationData} changeUnits = {() => changeUnits}/>
 
 
-            <TouchableOpacity style = {styles.saveButton} onPress = {() => addToBookmark()}>
+            <TouchableOpacity style = {styles.saveButton} onPress = {() => addBookmark()}>
                 <Text style = {styles.saveText}> <Icon name = "bookmark" size = {20}/> Save location</Text>
             </TouchableOpacity >
         </View>

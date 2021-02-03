@@ -10,6 +10,8 @@ import API from '../apis/weather/weatherApi';
 
 function LocationSearch(props) {
 
+        const { changeLocationState, locationData } = props;
+
         useEffect(() => {
             setTimeout(() => {
                 getPermissions();
@@ -18,7 +20,7 @@ function LocationSearch(props) {
 
         async function getPermissions(){
 
-            const { changeLocationState } = props;
+            console.log("PASO 1");
 
             if(Platform.OS == "android"){
                 const granted = await PermissionsAndroid.request(
@@ -39,17 +41,18 @@ function LocationSearch(props) {
             } else {
                 // getCurrentPosition();
                 changeLocationState({
-                    lat: 51.509865,
-                    lon: -0.118092
+                    lat: 53.478062,
+                    lon: -2.244666
                 })
 
-                getLocationName(51.509865, -0.118092);
+                getLocationName(53.478062, -2.244666);
             }
         }
 
         async function getCurrentPosition(){
-            const { changeLocationState } = props;
-           
+ 
+            console.log("PASO 2");
+
             Geolocation.getCurrentPosition(
                 (position) => {
 
@@ -67,11 +70,48 @@ function LocationSearch(props) {
             );
         }
 
-        async function getLocationWeather(){
+        function getLocationName(lat, lon){
+            
+            console.log("PASO 3", lat, lon);
+            var city = "";
+            var country = "";
+
+            Geocoder.init('AIzaSyCpU3x_xDHxgw-lzjj1AyOpL8Ww3CamaHs'); // use a valid API key
+            Geocoder.from(lat, lon).then(json => {
+
+                var addressComponent = json.results[0].address_components;
+
+                console.log("adress com =>", addressComponent)
+
+                for (var obj of addressComponent) {
+
+                    if (obj.types[0] == "country" || obj.types[0] == "political") {
+                        country = obj.long_name
+                    } else if (obj.types[0] == "locality" || obj.types[0] == "postal_town") {
+                        city = obj.long_name
+                    }
+                }
+                changeLocationState({
+                    city: city + ", " + country, 
+                });
+            });
+            
+            getLocationWeather(lat, lon);
+
+        }
+
+        async function getLocationWeather(lat, lon){
+
             try {
-                const { locationData, changeLocationState } = props;
-    
-                const weatherResponse = await API.getLocationData(locationData);
+                const data = {
+                    units: "metric", 
+                    lat:lat, 
+                    lon: lon
+                }
+
+                console.log("PASO 4", locationData);
+
+                const weatherResponse = await API.getLocationData(data);
     
                 console.log('weather response =>', weatherResponse);
     
@@ -106,37 +146,7 @@ function LocationSearch(props) {
             }
         }
 
-        async function getLocationName(lat, lon){
-
-            const { changeLocationState, locationData } = props;
-
-            Geocoder.init('AIzaSyCpU3x_xDHxgw-lzjj1AyOpL8Ww3CamaHs'); // use a valid API key
-            Geocoder.from(lat, lon).then(json => {
-
-                var addressComponent = json.results[0].address_components;
-                var city = "";
-                var country = "";
-
-                console.log("adress com =>", addressComponent)
-
-                for (var obj of addressComponent) {
-
-                    if (obj.types[0] == "country" || obj.types[0] == "political") {
-                        country = obj.long_name
-                    } else if (obj.types[0] == "locality" || obj.types[0] == "postal_town") {
-                        city = obj.long_name
-                    }
-                }
-
-                changeLocationState({
-                    city: city + ", " + country
-                });
-
-                getLocationWeather(locationData);
-
-            });
-        }
-
+    
         console.log("props => ", props.locationData);
         
         return(

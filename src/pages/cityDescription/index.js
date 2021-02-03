@@ -11,7 +11,7 @@ import API from '../../apis/weather/weatherApi';
 function CityDescription(props) {
 
     const db = firebase.firestore();
-    const [isBookmarked, setIsBookmarked] = useState(null);
+    const [isBookmarked, setIsBookmarked] = useState(true);
 
     useEffect(() => {
         getWeatherData();
@@ -61,7 +61,7 @@ function CityDescription(props) {
                     city: cityData.city
                 });
 
-                validateBookmark();
+                // validateBookmark();
                
             } else {
 
