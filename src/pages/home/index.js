@@ -1,6 +1,8 @@
 import React, {useState} from "react";
 import { View, Text, TouchableOpacity, Platform, StyleSheet, Image } from "react-native";
 import { connect } from "react-redux";
+import * as firebase from 'firebase';
+import Icon from 'react-native-vector-icons/FontAwesome';
 //local imports
 import API from '../../apis/weather/weatherApi';
 import HomeHeader from '../home/designComponents/homeHeader';
@@ -63,13 +65,28 @@ function Home(props) {
 
         // getWeatherData();
     }
-    
+
+    async function addBookmark() {
+        const db = firebase.firestore();
+
+        await db.collection('bookmarks').doc(locationData.city).set({
+            city: locationData.city, 
+            lat: locationData.lat,
+            lon: locationData.lon
+        });
+    }   
+    console.log("location => ", locationData);
     return(
         <View style = {styles.container}>
             <LoaderModal visibleModal={loadingModal} text={'Loading...'} />
 
             <HomeHeader {...props}/>
             <LocationWeatherDesign locationData = {locationData} changeUnits = {() => changeUnits}/>
+
+
+            <TouchableOpacity style = {styles.saveButton} onPress = {() => addToBookmark()}>
+                <Text style = {styles.saveText}> <Icon name = "bookmark" size = {20}/> Save location</Text>
+            </TouchableOpacity >
         </View>
     );
 }
@@ -85,6 +102,15 @@ const styles = StyleSheet.create({
         width: 150,
         marginBottom: 30
     }, 
+    saveButton: {
+        position: "absolute", 
+        bottom: 35, 
+        alignSelf: "center"
+    }, 
+    saveText: {
+        fontWeight: "300",
+        color: "black"
+    }
 });
 
 const mapStateToProps = (state) => {

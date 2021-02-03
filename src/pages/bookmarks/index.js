@@ -8,24 +8,21 @@ import BookmarksList from './designComponents/bookmarksList';
 import BookmarHeader from './designComponents/bookmarksHeader';
 import NoBookmarks from './designComponents/noBookmarks';
 import setBookmarksList from '../../redux/actions/bookmarksActions';
-import firebaseConfig from '../../firebase/firebaseConfig';
+
 
 function Bookmarks(props) {
 
         useEffect(() => {
-            if(!firebase.apps.length){
-                firebase.initializeApp(firebaseConfig);
-            }
             
             getBookmarks();
         }, [])
 
         async function getBookmarks(){
             const { setBookmarksList } = props;
-            firebase.firestore().settings({ experimentalForceLongPolling: true });
-            
-            const snapshot = await firebase.firestore().collection('bookmarks').get()
-            var result = snapshot.docs.map(doc => doc.data())
+
+            const snapshot = await firebase.firestore().collection('bookmarks').get();
+            var result = snapshot.docs.map(doc => doc.data());
+
             setBookmarksList({data: result});   
         }
 

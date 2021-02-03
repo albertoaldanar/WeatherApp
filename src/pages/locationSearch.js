@@ -18,6 +18,8 @@ function LocationSearch(props) {
 
         async function getPermissions(){
 
+            const { changeLocationState } = props;
+
             if(Platform.OS == "android"){
                 const granted = await PermissionsAndroid.request(
                     PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -37,11 +39,11 @@ function LocationSearch(props) {
             } else {
                 // getCurrentPosition();
                 changeLocationState({
-                    lat: 23.2267,
-                    lon: -106.408
+                    lat: 51.509865,
+                    lon: -0.118092
                 })
 
-                getLocationName(23.2267, -106.408);
+                getLocationName(51.509865, -0.118092);
             }
         }
 
@@ -115,11 +117,13 @@ function LocationSearch(props) {
                 var city = "";
                 var country = "";
 
+                console.log("adress com =>", addressComponent)
+
                 for (var obj of addressComponent) {
 
                     if (obj.types[0] == "country" || obj.types[0] == "political") {
                         country = obj.long_name
-                    } else if (obj.types[0] == "locality") {
+                    } else if (obj.types[0] == "locality" || obj.types[0] == "postal_town") {
                         city = obj.long_name
                     }
                 }

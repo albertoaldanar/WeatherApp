@@ -20,6 +20,7 @@ function BookmarksList(props) {
                 data= {props.bookmarks.data}
                 renderItem = {renderBookmark}
                 keyExtractor = {item => item.temp}
+                extraData = {props.bookmarks.data}
             />
         </View>
     );
