@@ -29,11 +29,11 @@ function LocationWeatherDesign(props) {
             <View style = {styles.container}>
                 
                 <View style = {{flexDirection:"row", marginTop: 20}}>
-                    <TouchableOpacity style= {{marginLeft: 12, marginRight: 15}} onPress = {changeUnits("metric")}>
+                    <TouchableOpacity style= {{marginLeft: 12, marginRight: 15}} onPress = { value => changeUnits("metric")}>
                         <Text style = {locationData.units == "metric" ? styles.unitSelected : null}>Cº</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress = {changeUnits("imperial")}>
+                    <TouchableOpacity onPress = {value => changeUnits("imperial")}>
                         <Text style = {locationData.units == "imperial" ? styles.unitSelected : null}>Fº</Text>
                     </TouchableOpacity>
                 </View>

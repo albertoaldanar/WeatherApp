@@ -15,13 +15,19 @@ function Home(props) {
     const [ loadingModal, setLoadingModal ] = useState(false);
     const { locationData, changeLocationState } = props;
 
-    async function getWeatherData() {
+    async function getWeatherData(unit) {
+
+        const data = {
+            units: unit, 
+            lat: locationData.lat, 
+            lon: locationData.lon
+        }
+
         setLoadingModal(true);
 
         try {
-            const { locationData, changeLocationState } = props;
 
-            const weatherResponse = await API.getLocationData(locationData);
+            const weatherResponse = await API.getLocationData(data);
 
             console.log('weather response =>', weatherResponse);
 
@@ -59,11 +65,12 @@ function Home(props) {
     }
 
     const changeUnits = (unit) => {
+        console.log("UNIT=> ",  unit)
         changeLocationState({
             units: unit
         });
 
-        // getWeatherData();
+        getWeatherData(unit);
     }
 
     async function addBookmark() {
@@ -93,8 +100,7 @@ function Home(props) {
             <LoaderModal visibleModal={loadingModal} text={'Loading...'} />
 
             <HomeHeader {...props}/>
-            <LocationWeatherDesign locationData = {locationData} changeUnits = {() => changeUnits}/>
-
+            <LocationWeatherDesign locationData = {locationData} changeUnits = {changeUnits}/>
 
             <TouchableOpacity style = {styles.saveButton} onPress = {() => addBookmark()}>
                 <Text style = {styles.saveText}> <Icon name = "bookmark" size = {20}/> Save location</Text>
