@@ -1,27 +1,58 @@
-import React, {useState} from "react";
-import { Alert, View, Text, TouchableOpacity, Platform, StyleSheet, Image } from "react-native";
+import React, {useState, useRef} from "react";
+import { Alert, View, Text, TouchableOpacity, Platform, StyleSheet, Image, ScrollView } from "react-native";
 import { connect } from "react-redux";
 import * as firebase from 'firebase';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 //local imports
 import API from '../../apis/weather/weatherApi';
 import HomeHeader from '../home/designComponents/homeHeader';
 import LocationWeatherDesign from '../home/designComponents/locationWeatherDesign';
 import changeLocationState from '../../redux/actions/locationDataActions';
 import LoaderModal from '../../utils/modalLoader';
-
+ 
 function Home(props) {
 
     const [ loadingModal, setLoadingModal ] = useState(false);
     const { locationData, changeLocationState } = props;
 
-    async function getWeatherData(unit) {
+    const inputGoogle = useRef(null); 
+
+    const homePlace = {
+        description: "Home", 
+        geometry: { 
+            location: {
+                lat: 53.478062,
+                lon: -2.244666
+            } 
+        }
+    }
+
+    const barcelona = {
+        description: "Barcelona", 
+        geometry: { 
+            location: {
+                lat: 53.478062,
+                lon: -2.244666
+            } 
+        }
+    }
+
+    async function getWeatherData(unit, lat, lon, city) {
 
         const data = {
             units: unit, 
-            lat: locationData.lat, 
-            lon: locationData.lon
+            lat: lat, 
+            lon: lon
         }
+
+        if(city != undefined){
+            changeLocationState({
+                city: city
+            })
+        }
+
+        inputGoogle.current.setAddressText("");
 
         setLoadingModal(true);
 
@@ -65,12 +96,12 @@ function Home(props) {
     }
 
     const changeUnits = (unit) => {
-        console.log("UNIT=> ",  unit)
+
         changeLocationState({
             units: unit
         });
 
-        getWeatherData(unit);
+        getWeatherData(unit, locationData.lat, locationData.lon);
     }
 
     async function addBookmark() {
@@ -87,11 +118,10 @@ function Home(props) {
             "Bookmark saved correctly",
             [
 
-              { text: "OK", onPress: () => console.log("OK Pressed") }
+              { text: "OK", onPress: () => props.navigation.navigate('Bookmarks')}
             ],
             { cancelable: false }
           );
-      
     }   
     console.log("location => ", locationData);
 
@@ -100,7 +130,61 @@ function Home(props) {
             <LoaderModal visibleModal={loadingModal} text={'Loading...'} />
 
             <HomeHeader {...props}/>
+
+            <ScrollView keyboardShouldPersistTaps={"always"}>
+
+            <GooglePlacesAutocomplete
+                ref={inputGoogle}
+                placeholder='Search city...'
+                minLength={2}
+                autoFocus={false}
+                listViewDisplayed='auto'
+                returnKeyType={'default'}
+                fetchDetails={true}
+                nearbyPlacesAPI='GooglePlacesSearch'
+                GooglePlacesSearchQuery={{
+                    rankby: 'distance',
+                    type: 'establishment'
+                }}
+                styles={{
+                    container: {
+                        margin: 0,
+                        
+                    },
+                    listView : {
+                        backgroundColor: "#f5f5f5"
+                    },
+                    textInputContainer: {
+                       width: '100%',
+                       marginTop: 15, 
+                    },
+                    textInput: {
+                        color: '#5d5d5d',
+                        height: 20,
+                        backgroundColor: "#f5f5f5",
+                        fontSize: 16, 
+                        height: 38,
+                    },
+                    predefinedPlacesDescription: {
+                        color: '#1faadb'
+                    }
+                }}
+                query={{
+                    key: 'AIzaSyCpU3x_xDHxgw-lzjj1AyOpL8Ww3CamaHs',
+                    language: 'es', // language of the results
+                }}
+                listViewDisplayed='auto'
+                fetchDetails={true}
+                renderDescription={row => row.description} 
+                onPress={(data, details = null) => {
+                    console.log("details =>", details);
+                    getWeatherData("metric", details.geometry.location.lat, details.geometry.location.lng, details.formatted_address);
+                }}
+                predefinedPlaces = {[homePlace, barcelona]}
+            />
             <LocationWeatherDesign locationData = {locationData} changeUnits = {changeUnits}/>
+
+            </ScrollView>
 
             <TouchableOpacity style = {styles.saveButton} onPress = {() => addBookmark()}>
                 <Text style = {styles.saveText}> <Icon name = "bookmark" size = {20}/> Save location</Text>

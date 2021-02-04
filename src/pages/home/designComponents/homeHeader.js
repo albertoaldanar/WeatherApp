@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Platform, StyleSheet, Image } from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
-Icon.loadFont();
 
 function HomeHeader(props) {
         console.log(props);

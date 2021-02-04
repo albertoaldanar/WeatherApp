@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Platform, StyleSheet, Image, FlatList } from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
-// Icon.loadFont();
 
 function LocationWeatherDesign(props) {
 
@@ -23,18 +22,17 @@ function LocationWeatherDesign(props) {
         );
 
         const { locationData, changeUnits } = props;
-        console.log(changeUnits);
 
         return(
             <View style = {styles.container}>
                 
                 <View style = {{flexDirection:"row", marginTop: 20}}>
                     <TouchableOpacity style= {{marginLeft: 12, marginRight: 15}} onPress = { value => changeUnits("metric")}>
-                        <Text style = {locationData.units == "metric" ? styles.unitSelected : null}>Cº</Text>
+                        <Text style = {locationData.units == "metric" ? styles.unitSelected : styles.unitNotSelected}>Cº</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress = {value => changeUnits("imperial")}>
-                        <Text style = {locationData.units == "imperial" ? styles.unitSelected : null}>Fº</Text>
+                        <Text style = {locationData.units == "imperial" ? styles.unitSelected : styles.unitNotSelected}>Fº</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -120,6 +118,9 @@ const styles = StyleSheet.create({
         textDecorationLine: "underline", 
         color: "#f83e3d"
     }, 
+    unitNotSelected: {
+        color: "gray"
+    },
     currentMainData: {
         flexDirection: "row",
         justifyContent: "space-between", 
