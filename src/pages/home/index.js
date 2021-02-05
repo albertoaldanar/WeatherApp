@@ -1,4 +1,4 @@
-import React, {useState, useRef} from "react";
+import React, {useState, useRef, useEffect} from "react";
 import { Alert, View, Text, TouchableOpacity, Platform, StyleSheet, Image, ScrollView } from "react-native";
 import { connect } from "react-redux";
 import * as firebase from 'firebase';
@@ -17,8 +17,7 @@ function Home(props) {
     const { locationData, changeLocationState } = props;
     const inputGoogle = useRef(null); 
     const db = firebase.firestore();
-
-    const homePlace = {
+    const deviceLocation = {
         description: "Your location", 
         geometry: { 
             location: {
@@ -27,16 +26,41 @@ function Home(props) {
             } 
         }, 
         formatted_address: locationData.deviceCity
+    } 
+    const [searchList, setSearchList ] = useState([]);
+    const [reload, setReload ] = useState(false);
+
+    useEffect(() => {
+        getSearchList();
+    }, [searchList])
+
+    async function getSearchList(){
+        const snapshot = await firebase.firestore().collection('searchList').get();
+        var result = snapshot.docs.map(doc => doc.data());
+        
+        setTimeout(() => {
+            setSearchList(result)
+        });
     }
 
-    const barcelona = {
-        description: "Barcelona", 
-        geometry: { 
-            location: {
-                lat: 53.478062,
-                lng: -2.244666
-            } 
+    async function saveSearch(city, lat, lon){
+
+        if(city != locationData.deviceCity){
+            await db.collection('searchList').doc(city).set({
+                description: city, 
+                geometry: { 
+                    location: {
+                        lat: lat,
+                        lng: lon
+                    } 
+                }, 
+                formatted_address: city
+            });  
         }
+
+        setReload(!reload);
+
+        getSearchList();
     }
 
     async function getWeatherData(unit, lat, lon, city) {
@@ -46,11 +70,13 @@ function Home(props) {
             lat: lat, 
             lon: lon
         }
-
-        if(city != undefined){
+        
+        if(city != undefined){  // Only executed when changed city
             changeLocationState({
                 city: city, lat: lat, lon: lon
             })
+
+            saveSearch(city, lat, lon);
         }
 
         inputGoogle.current.setAddressText("");
@@ -121,9 +147,10 @@ function Home(props) {
               { text: "OK", onPress: () => props.navigation.navigate('Bookmarks')}
             ],
             { cancelable: false }
-          );
+        );
     }   
-    console.log("location => ", locationData);
+
+    console.log("location => ", locationData, searchList);
 
     return(
         <View style = {styles.container}>
@@ -132,55 +159,59 @@ function Home(props) {
             <HomeHeader {...props}/>
 
             <ScrollView keyboardShouldPersistTaps={"always"}>
-
-                <GooglePlacesAutocomplete
-                    ref={inputGoogle}
-                    placeholder='Search city...'
-                    minLength={2}
-                    autoFocus={false}
-                    listViewDisplayed='auto'
-                    returnKeyType={'default'}
-                    fetchDetails={true}
-                    nearbyPlacesAPI='GooglePlacesSearch'
-                    GooglePlacesSearchQuery={{
-                        rankby: 'distance',
-                        type: 'establishment'
-                    }}
-                    styles={{
-                        container: {
-                            margin: 0,
-                        },
-                        listView : {
-                            backgroundColor: "#f5f5f5"
-                        },
-                        textInputContainer: {
-                        width: '100%',
-                        marginTop: 15, 
-                        },
-                        textInput: {
-                            color: '#5d5d5d',
-                            height: 20,
-                            backgroundColor: "#f5f5f5",
-                            fontSize: 16, 
-                            height: 38,
-                        },
-                        predefinedPlacesDescription: {
-                            color: '#1faadb'
-                        }
-                    }}
-                    query={{
-                        key: 'AIzaSyCpU3x_xDHxgw-lzjj1AyOpL8Ww3CamaHs',
-                        language: 'es', // language of the results
-                    }}
-                    listViewDisplayed='auto'
-                    fetchDetails={true}
-                    renderDescription={row => row.description} 
-                    onPress={(data, details = null) => {
-                        console.log("details =>", details);
-                        getWeatherData("metric", details.geometry.location.lat, details.geometry.location.lng, details.formatted_address);
-                    }}
-                    predefinedPlaces = {[homePlace, barcelona]}
-                />
+                {
+                    searchList.length > 0 ? 
+                        <GooglePlacesAutocomplete
+                            ref={inputGoogle}
+                            placeholder='Search city..'
+                            minLength={2}
+                            autoFocus={false}
+                            listViewDisplayed='auto'
+                            returnKeyType={'default'}
+                            fetchDetails={true}
+                            nearbyPlacesAPI='GooglePlacesSearch'
+                            GooglePlacesSearchQuery={{
+                                rankby: 'distance',
+                                type: 'establishment'
+                            }}
+                            styles={{
+                                container: {
+                                    margin: 0,
+                                },
+                                listView : {
+                                    backgroundColor: "#f5f5f5"
+                                },
+                                textInputContainer: {
+                                width: '100%',
+                                marginTop: 15, 
+                                },
+                                textInput: {
+                                    color: '#5d5d5d',
+                                    height: 20,
+                                    backgroundColor: "#f5f5f5",
+                                    fontSize: 16, 
+                                    height: 38,
+                                },
+                                predefinedPlacesDescription: {
+                                    color: '#1faadb'
+                                }
+                            }}
+                            query={{
+                                key: 'AIzaSyCpU3x_xDHxgw-lzjj1AyOpL8Ww3CamaHs',
+                                language: 'es', // language of the results
+                            }}
+                            listViewDisplayed='auto'
+                            fetchDetails={true}
+                            renderDescription={row => row.description} 
+                            onPress={(data, details = null) => {
+                                console.log("details =>", details);
+                                getWeatherData("metric", details.geometry.location.lat, details.geometry.location.lng, details.formatted_address);
+                            }}
+                            predefinedPlaces = {[deviceLocation].concat(searchList) }
+                        /> 
+                    : 
+                        null
+                }
                 <LocationWeatherDesign locationData = {locationData} changeUnits = {changeUnits}/>
                 
                 <TouchableOpacity style = {styles.saveButton} onPress = {() => addBookmark()}>

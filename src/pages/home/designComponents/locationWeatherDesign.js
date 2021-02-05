@@ -75,7 +75,7 @@ function LocationWeatherDesign(props) {
                         />
                     </View>
 
-                    <Text style = {styles.title}> Pronostico semanal</Text>
+                    <Text style = {styles.title}> Pronostico semanal (Max & Min)</Text>
                     <View style = {styles.lists}>
                         <FlatList 
                             data = {locationData.dailyData}
