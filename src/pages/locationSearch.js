@@ -6,6 +6,7 @@ import Geolocation from 'react-native-geolocation-service';
 //local imports
 import LocationGif from '../assets/location.gif';
 import changeLocationState from '../redux/actions/locationDataActions';
+
 import API from '../apis/weather/weatherApi';
 
 function LocationSearch(props) {
@@ -42,7 +43,9 @@ function LocationSearch(props) {
                 // getCurrentPosition();
                 changeLocationState({
                     lat: 53.478062,
-                    lon: -2.244666
+                    lon: -2.244666, 
+                    deviceLat: 53.478062, 
+                    deviceLon: -2.244666,
                 })
 
                 getLocationName(53.478062, -2.244666);
@@ -59,8 +62,10 @@ function LocationSearch(props) {
                     console.log("POSITION = >", position);
 
                     changeLocationState({
+                        deviceLat: position.coords.latitude, 
+                        deviceLon: position.coords.longitude,
                         lat: position.coords.latitude,
-                        lon: position.coords.longitude
+                        lon: position.coords.longitude, 
                     })
 
                     getLocationName(position.coords.latitude, position.coords.longitude);
@@ -93,6 +98,7 @@ function LocationSearch(props) {
                 }
                 changeLocationState({
                     city: city + ", " + country, 
+                    deviceCity: city + ", " + country
                 });
             });
             
@@ -172,7 +178,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state) => {
     return {
-        locationData: state.locationData,
+        locationData: state.locationData
     }
 }
 

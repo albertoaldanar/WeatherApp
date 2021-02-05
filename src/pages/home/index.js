@@ -15,17 +15,18 @@ function Home(props) {
 
     const [ loadingModal, setLoadingModal ] = useState(false);
     const { locationData, changeLocationState } = props;
-
     const inputGoogle = useRef(null); 
+    const db = firebase.firestore();
 
     const homePlace = {
-        description: "Home", 
+        description: "Your location", 
         geometry: { 
             location: {
-                lat: 53.478062,
-                lon: -2.244666
+                lat: locationData.deviceLat,
+                lng: locationData.deviceLon
             } 
-        }
+        }, 
+        formatted_address: locationData.deviceCity
     }
 
     const barcelona = {
@@ -33,7 +34,7 @@ function Home(props) {
         geometry: { 
             location: {
                 lat: 53.478062,
-                lon: -2.244666
+                lng: -2.244666
             } 
         }
     }
@@ -48,7 +49,7 @@ function Home(props) {
 
         if(city != undefined){
             changeLocationState({
-                city: city
+                city: city, lat: lat, lon: lon
             })
         }
 
@@ -68,7 +69,7 @@ function Home(props) {
                 changeLocationState({
                     hourlyData: weatherResponse.hourly.slice(0, 25), 
                     dailyData: weatherResponse.daily, 
-                    currentMainData: weatherResponse.current 
+                    currentMainData: weatherResponse.current, 
                 });
                
             } else {
@@ -104,8 +105,7 @@ function Home(props) {
         getWeatherData(unit, locationData.lat, locationData.lon);
     }
 
-    async function addBookmark() {
-        const db = firebase.firestore();
+    async function addBookmark(){ 
 
         await db.collection('bookmarks').doc(locationData.city).set({
             city: locationData.city, 
@@ -133,62 +133,60 @@ function Home(props) {
 
             <ScrollView keyboardShouldPersistTaps={"always"}>
 
-            <GooglePlacesAutocomplete
-                ref={inputGoogle}
-                placeholder='Search city...'
-                minLength={2}
-                autoFocus={false}
-                listViewDisplayed='auto'
-                returnKeyType={'default'}
-                fetchDetails={true}
-                nearbyPlacesAPI='GooglePlacesSearch'
-                GooglePlacesSearchQuery={{
-                    rankby: 'distance',
-                    type: 'establishment'
-                }}
-                styles={{
-                    container: {
-                        margin: 0,
-                        
-                    },
-                    listView : {
-                        backgroundColor: "#f5f5f5"
-                    },
-                    textInputContainer: {
-                       width: '100%',
-                       marginTop: 15, 
-                    },
-                    textInput: {
-                        color: '#5d5d5d',
-                        height: 20,
-                        backgroundColor: "#f5f5f5",
-                        fontSize: 16, 
-                        height: 38,
-                    },
-                    predefinedPlacesDescription: {
-                        color: '#1faadb'
-                    }
-                }}
-                query={{
-                    key: 'AIzaSyCpU3x_xDHxgw-lzjj1AyOpL8Ww3CamaHs',
-                    language: 'es', // language of the results
-                }}
-                listViewDisplayed='auto'
-                fetchDetails={true}
-                renderDescription={row => row.description} 
-                onPress={(data, details = null) => {
-                    console.log("details =>", details);
-                    getWeatherData("metric", details.geometry.location.lat, details.geometry.location.lng, details.formatted_address);
-                }}
-                predefinedPlaces = {[homePlace, barcelona]}
-            />
-            <LocationWeatherDesign locationData = {locationData} changeUnits = {changeUnits}/>
-
+                <GooglePlacesAutocomplete
+                    ref={inputGoogle}
+                    placeholder='Search city...'
+                    minLength={2}
+                    autoFocus={false}
+                    listViewDisplayed='auto'
+                    returnKeyType={'default'}
+                    fetchDetails={true}
+                    nearbyPlacesAPI='GooglePlacesSearch'
+                    GooglePlacesSearchQuery={{
+                        rankby: 'distance',
+                        type: 'establishment'
+                    }}
+                    styles={{
+                        container: {
+                            margin: 0,
+                        },
+                        listView : {
+                            backgroundColor: "#f5f5f5"
+                        },
+                        textInputContainer: {
+                        width: '100%',
+                        marginTop: 15, 
+                        },
+                        textInput: {
+                            color: '#5d5d5d',
+                            height: 20,
+                            backgroundColor: "#f5f5f5",
+                            fontSize: 16, 
+                            height: 38,
+                        },
+                        predefinedPlacesDescription: {
+                            color: '#1faadb'
+                        }
+                    }}
+                    query={{
+                        key: 'AIzaSyCpU3x_xDHxgw-lzjj1AyOpL8Ww3CamaHs',
+                        language: 'es', // language of the results
+                    }}
+                    listViewDisplayed='auto'
+                    fetchDetails={true}
+                    renderDescription={row => row.description} 
+                    onPress={(data, details = null) => {
+                        console.log("details =>", details);
+                        getWeatherData("metric", details.geometry.location.lat, details.geometry.location.lng, details.formatted_address);
+                    }}
+                    predefinedPlaces = {[homePlace, barcelona]}
+                />
+                <LocationWeatherDesign locationData = {locationData} changeUnits = {changeUnits}/>
+                
+                <TouchableOpacity style = {styles.saveButton} onPress = {() => addBookmark()}>
+                    <Text style = {styles.saveText}> <Icon name = "bookmark" size = {20}/> Save location</Text>
+                </TouchableOpacity>
             </ScrollView>
-
-            <TouchableOpacity style = {styles.saveButton} onPress = {() => addBookmark()}>
-                <Text style = {styles.saveText}> <Icon name = "bookmark" size = {20}/> Save location</Text>
-            </TouchableOpacity >
         </View>
     );
 }
@@ -205,8 +203,7 @@ const styles = StyleSheet.create({
         marginBottom: 30
     }, 
     saveButton: {
-        position: "absolute", 
-        bottom: 35, 
+        marginTop: 30,
         alignSelf: "center"
     }, 
     saveText: {

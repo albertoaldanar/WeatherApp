@@ -14,6 +14,9 @@ const initialState = {
   dailyData: [
     
   ], 
+  deviceLat: 0, 
+  deviceLon: 0,
+  deviceCity: "",
 }
 
 export default function(state = initialState, action) {

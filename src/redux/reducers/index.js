@@ -6,5 +6,5 @@ import bookmarksReducer from './bookmarksReducer';
 export default combineReducers({
     locationData: locationDataReducer, 
     selectedCityData: selectedCityReducer,
-    bookmarksData: bookmarksReducer
+    bookmarksData: bookmarksReducer, 
 });
