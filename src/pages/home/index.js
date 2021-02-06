@@ -32,7 +32,7 @@ function Home(props) {
 
     useEffect(() => {
         getSearchList();
-    }, [searchList])
+    }, [])
 
     async function getSearchList(){
         const snapshot = await firebase.firestore().collection('searchList').get();
@@ -58,7 +58,7 @@ function Home(props) {
             });  
         }
 
-        setReload(!reload);
+        // setReload(!reload);
 
         getSearchList();
     }

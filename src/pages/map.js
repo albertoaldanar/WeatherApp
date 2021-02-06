@@ -1,27 +1,105 @@
+
 import React, {useState} from "react";
-import { useReducer } from "react";
-import { View, Text, TouchableOpacity, Platform, StyleSheet, Image, FlatList, Modal } from "react-native";
+import { View, Text, TouchableOpacity, Platform, StyleSheet, Image, FlatList, Modal, Dimensions } from "react-native";
 import MapView, { PROVIDER_GOOGLE,  Marker, Polyline} from 'react-native-maps';
+import { connect } from "react-redux";
+//local imports
+import API from '../apis/weather/weatherApi';
 
 function Map(props) {
 
-        const [showDescription, setShowDescription] = useState(false);
-        const [appointmentSelected, setAppointmentSelected] = useState({});
-        const region = {
-            latitude: 24.80664999917974,
-            longitude: -107.3964986262915,
-            latitudeDelta: 0.16251275933643683,
-            longitudeDelta: 0.10970118399998796
+        const [cities, setCities] = useState([]);
+        const { locationData } = props;
+
+        const [region, setRegion] = useState({
+            latitude: locationData.deviceLat,
+            longitude: locationData.deviceLon,
+            latitudeDelta: 10.9,
+            longitudeDelta: 10.9 
+        }); 
+
+        function coordinatesToTiles(lon, lat, zoom) { 
+            console.log("lat y lon =>", lon, lat, zoom)
+
+            const tileZoom = (Math.log2(360 * (Dimensions.get("window").width / 256 / zoom)) + 1).toFixed()
+
+            const tileY = ( Math.floor( (lon + 180) / 360 * Math.pow(2, tileZoom)) ); 
+            const tileX = (Math.floor((1-Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI/180)) / Math.PI) / 2 * Math.pow(2,tileZoom))); 
+
+            console.log("X & Y  => ", tileY, tileX, tileZoom.toFixed(0))
         }
 
+        async function getCitiesList(reg){
+            console.log("log > ", reg);
+            const { latitude, longitude, longitudeDelta } = reg;
+
+            const tileZoom = (Math.log2(360 * (Dimensions.get("window").width / 256 / longitudeDelta)) + 1).toFixed()
+
+            const tileY = ( Math.floor( (longitude + 180) / 360 * Math.pow(2, tileZoom)) ); 
+            const tileX = (Math.floor((1-Math.log(Math.tan(latitude * Math.PI / 180) + 1 / Math.cos(latitude * Math.PI/180)) / Math.PI) / 2 * Math.pow(2,tileZoom))); 
+
+            console.log("X & Y  => ", tileY, tileX, tileZoom);
+
+            try {
+                const data = {
+                    zoom: tileZoom, 
+                    x: tileY, 
+                    y: tileX
+                }
+                const weatherResponse = await API.mapData(data);
+    
+                console.log('weather response =>', weatherResponse);
+
+                if (weatherResponse.features) {
+                    console.log("success")
+                    
+                    setCities(weatherResponse.features)
+                } else {
+                    alert("error")
+                    console.log("error!")
+                }
+              
+            } catch (err) {
+                alert(err);
+    
+                if (err instanceof TypeError) {
+                    if (err.message == 'Network request failed') {
+                        alert("No hay internet");
+                           console.log("No hay internet")
+                    }
+                    else {
+                        alert("El servicio esta fallando.")
+                        console.log('Ups..', 'Por el momento este servicio no esta disponible, vuelva a intentarlo mas tarde');
+                    }
+                }
+            }
+        }
+
+        console.log("cities =>", cities);
         return(
             <View style = {styles.container}>
 
-            <MapView
-                showsUserLocation
-                style={ styles.map}
-                initialRegion={region}
-            />
+                <MapView
+                    showsUserLocation
+                    style={ styles.map}
+                    initialRegion={region}
+                    onRegionChangeComplete = {region => getCitiesList(region)}
+                >
+                    {
+                        cities.map(city => (
+                            <View>
+                                <Marker
+                                    coordinate={{
+                                        latitude: city.geometry.coordinates[1],
+                                        longitude: city.geometry.coordinates[0]
+                                    }}
+                                    pinColor = "red"
+                                    title={city.properties.city + ", " + city.properties.country + ":  " + city.properties.temp + "º"}
+                                />
+                            </View>
+                        ))
+                    }
+                </MapView>
             </View>
         );
 }
@@ -68,7 +146,10 @@ const styles = StyleSheet.create({
 
 });
 
-export default Map;
+const mapStateToProps = (state) => {
+    return {
+        locationData: state.locationData
+    }
+}
 
-
-
+export default connect(mapStateToProps)(Map);
