@@ -13,8 +13,9 @@ import LoaderModal from '../../utils/modalLoader';
  
 function Home(props) {
 
-    const [ loadingModal, setLoadingModal ] = useState(false);
     const { locationData, changeLocationState } = props;
+    const [ loadingModal, setLoadingModal ] = useState(false);
+    const [ isBookmarked, setIsBookmarked] = useState(false);
     const inputGoogle = useRef(null); 
     const db = firebase.firestore();
     const deviceLocation = {
@@ -28,7 +29,6 @@ function Home(props) {
         formatted_address: locationData.deviceCity
     } 
     const [searchList, setSearchList ] = useState([]);
-    const [reload, setReload ] = useState(false);
 
     useEffect(() => {
         getSearchList();
@@ -57,8 +57,6 @@ function Home(props) {
                 formatted_address: city
             });  
         }
-
-        // setReload(!reload);
 
         getSearchList();
     }
@@ -97,6 +95,8 @@ function Home(props) {
                     dailyData: weatherResponse.daily, 
                     currentMainData: weatherResponse.current, 
                 });
+
+                validateBookmark(city);
                
             } else {
                 setLoadingModal(false);
@@ -149,6 +149,22 @@ function Home(props) {
             { cancelable: false }
         );
     }   
+
+    async function validateBookmark(city) {
+
+        const snapshot = await firebase.firestore().collection('bookmarks').get();
+        var cities = snapshot.docs.map(doc => doc.data());
+
+        cities.map(c => {
+            console.log("compare =>", c, city)
+            if(c.city == city){
+                setIsBookmarked(true)
+            } else {
+                setIsBookmarked(false)
+            }    
+        });
+
+    }
 
     console.log("location => ", locationData, searchList);
 
@@ -213,10 +229,18 @@ function Home(props) {
                         null
                 }
                 <LocationWeatherDesign locationData = {locationData} changeUnits = {changeUnits}/>
-                
-                <TouchableOpacity style = {styles.saveButton} onPress = {() => addBookmark()}>
-                    <Text style = {styles.saveText}> <Icon name = "bookmark" size = {20}/> Save location</Text>
-                </TouchableOpacity>
+
+                {
+                    !isBookmarked ? 
+                        <TouchableOpacity style = {styles.saveButton} onPress = {() => addBookmark()}>
+                            <Text style = {styles.saveText}> <Icon name = "bookmark" size = {20}/> Save location</Text>
+                        </TouchableOpacity>
+                    : 
+                        <View style = {styles.saveButton}>
+                            <Text style = {styles.saveText}> <Icon name = "check" size = {20}/> Bookmarked</Text>
+                        </View>
+                }
+
             </ScrollView>
         </View>
     );

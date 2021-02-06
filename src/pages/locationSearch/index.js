@@ -4,10 +4,10 @@ import { connect } from "react-redux";
 import Geocoder from 'react-native-geocoding';
 import Geolocation from 'react-native-geolocation-service';
 //local imports
-import LocationGif from '../assets/location.gif';
-import changeLocationState from '../redux/actions/locationDataActions';
+import LocationGif from '../../assets/location.gif';
+import changeLocationState from '../../redux/actions/locationDataActions';
 
-import API from '../apis/weather/weatherApi';
+import API from '../../apis/weather/weatherApi';
 
 function LocationSearch(props) {
 

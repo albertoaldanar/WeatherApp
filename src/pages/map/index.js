@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity, Platform, StyleSheet, Image, FlatList, Mo
 import MapView, { PROVIDER_GOOGLE,  Marker, Polyline} from 'react-native-maps';
 import { connect } from "react-redux";
 //local imports
-import API from '../apis/weather/weatherApi';
+import API from '../../apis/weather/weatherApi';
 
 function Map(props) {
 
@@ -30,11 +30,13 @@ function Map(props) {
             console.log("X & Y  => ", tileY, tileX, tileZoom);
 
             try {
+                
                 const data = {
                     zoom: tileZoom, 
                     x: tileY, 
                     y: tileX
                 }
+
                 const weatherResponse = await API.mapData(data);
     
                 console.log('weather response =>', weatherResponse);
@@ -76,15 +78,29 @@ function Map(props) {
                 >
                     {
                         cities.map(city => (
+
                             <View>
                                 <Marker
+                                    onCalloutPress = {() => props.navigation.navigate("CityDescription", { 
+                                        data: { 
+                                            lat: city.geometry.coordinates[1], 
+                                            lon: city.geometry.coordinates[0], 
+                                            city: city.properties.city + ", " + city.properties.country 
+                                        } 
+                                    })}
                                     coordinate={{
                                         latitude: city.geometry.coordinates[1],
                                         longitude: city.geometry.coordinates[0]
                                     }}
                                     pinColor = "red"
-                                    title={city.properties.city + ", " + city.properties.country + ":  " + city.properties.temp + "º"}
+                                    title={city.properties.city + ", " + city.properties.country + ":  " + city.properties.temp + "º" }
                                 />
+
+                                <MapView.Callout>
+                                    <View>
+                                        <Text>Click Me!</Text>
+                                    </View>
+                                </MapView.Callout>
                             </View>
                         ))
                     }

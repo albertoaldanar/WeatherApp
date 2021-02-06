@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import { View, Text, TouchableOpacity, Platform, StyleSheet, Image } from "react-native";
+import { Alert, View, Text, TouchableOpacity, Platform, StyleSheet, Image } from "react-native";
 import { connect } from "react-redux";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import * as firebase from 'firebase';
@@ -10,8 +10,9 @@ import API from '../../apis/weather/weatherApi';
 
 function CityDescription(props) {
 
+    const { selectedCityData } = props;
     const db = firebase.firestore();
-    const [isBookmarked, setIsBookmarked] = useState(true);
+    const [isBookmarked, setIsBookmarked] = useState(false);
 
     useEffect(() => {
         getWeatherData();
@@ -25,12 +26,10 @@ function CityDescription(props) {
         var cities = snapshot.docs.map(doc => doc.data());
 
         cities.map(city => {
-            console.log(city)
-            if(city == cityData.city){
+            console.log("compare =>", city, cityData.city)
+            if(city.city == cityData.city){
                 setIsBookmarked(true)
-            }  else {
-                setIsBookmarked(false)
-            }
+            }    
         });
 
         console.log(cityData, cities);
@@ -61,7 +60,7 @@ function CityDescription(props) {
                     city: cityData.city
                 });
 
-                // validateBookmark();
+                validateBookmark();
                
             } else {
 
@@ -93,6 +92,16 @@ function CityDescription(props) {
             lat: selectedCityData.lat,
             lon: selectedCityData.lon
         });
+
+        Alert.alert(
+            "Saved!",
+            "Bookmark saved correctly",
+            [
+
+              { text: "OK", onPress: () => props.navigation.navigate('Bookmarks')}
+            ],
+            { cancelable: false }
+        );
     }
 
     async function deleteBookmark(){
@@ -108,9 +117,8 @@ function CityDescription(props) {
         await props.navigation.navigate("Bookmarks");
 
     }
-
-    const { selectedCityData } = props;
-    console.log("is booked =>", isBookmarked);
+    
+    console.log("is booked =>", isBookmarked, selectedCityData);
     
     return(
         <View style = {styles.container}>
