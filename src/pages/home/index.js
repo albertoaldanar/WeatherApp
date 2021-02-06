@@ -77,12 +77,12 @@ function Home(props) {
             })
 
             saveSearch(city, lat, lon);
+            setIsBookmarked(false);
         }
 
         inputGoogle.current.setAddressText("");
 
         setLoadingModal(true);
-        setIsBookmarked(false);
 
         try {
 
