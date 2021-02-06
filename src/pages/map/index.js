@@ -76,29 +76,15 @@ function Map(props) {
                 >
                     {
                         cities.map(city => (
-
                             <View>
                                 <Marker
-                                    onCalloutPress = {() => props.navigation.navigate("CityDescription", { 
-                                        data: { 
-                                            lat: city.geometry.coordinates[1], 
-                                            lon: city.geometry.coordinates[0], 
-                                            city: city.properties.city + ", " + city.properties.country 
-                                        } 
-                                    })}
                                     coordinate={{
                                         latitude: city.geometry.coordinates[1],
                                         longitude: city.geometry.coordinates[0]
                                     }}
                                     pinColor = "red"
-                                    title={city.properties.city + ", " + city.properties.country + ":  " + city.properties.temp + "º" }
+                                    title={city.properties.city + ", " + city.properties.country + ":  " + city.properties.temp + "º"}
                                 />
-
-                                <MapView.Callout>
-                                    <View>
-                                        <Text>Click Me!</Text>
-                                    </View>
-                                </MapView.Callout>
                             </View>
                         ))
                     }
