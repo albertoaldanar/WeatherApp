@@ -2,6 +2,7 @@
 import React, {useState} from "react";
 import { View, Text, TouchableOpacity, Platform, StyleSheet, Image, FlatList, Modal, Dimensions } from "react-native";
 import MapView, { PROVIDER_GOOGLE,  Marker, Polyline} from 'react-native-maps';
+import { Icon } from "react-native-vector-icons/FontAwesome";
 import { connect } from "react-redux";
 //local imports
 import API from '../../apis/weather/weatherApi';
@@ -30,7 +31,7 @@ function Map(props) {
             console.log("X & Y  => ", tileY, tileX, tileZoom);
 
             try {
-                
+
                 const data = {
                     zoom: tileZoom, 
                     x: tileY, 
@@ -69,6 +70,9 @@ function Map(props) {
         console.log("cities =>", cities);
         return(
             <View style = {styles.container}>
+                <TouchableOpacity style = {{zIndex: 10, padding: 20}}onPress = {() => props.navigation.goBack()}>
+                    <Text>Back</Text>
+                </TouchableOpacity>
 
                 <MapView
                     showsUserLocation
@@ -76,10 +80,11 @@ function Map(props) {
                     initialRegion={region}
                     onRegionChangeComplete = {region => getCitiesList(region)}
                 >
+
                     {
                         cities.map(city => (
 
-                            <View>
+                            
                                 <Marker
                                     onCalloutPress = {() => props.navigation.navigate("CityDescription", { 
                                         data: { 
@@ -95,13 +100,7 @@ function Map(props) {
                                     pinColor = "red"
                                     title={city.properties.city + ", " + city.properties.country + ":  " + city.properties.temp + "º" }
                                 />
-
-                                <MapView.Callout>
-                                    <View>
-                                        <Text>Click Me!</Text>
-                                    </View>
-                                </MapView.Callout>
-                            </View>
+                        
                         ))
                     }
                 </MapView>

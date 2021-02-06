@@ -7,6 +7,7 @@ import * as firebase from 'firebase';
 import setSelectedCity from '../../redux/actions/selectedCityActions';
 import setBookmarksList from '../../redux/actions/bookmarksActions';
 import API from '../../apis/weather/weatherApi';
+import Description from '../cityDescription/designComponents/description';
 
 function CityDescription(props) {
 
@@ -126,36 +127,7 @@ function CityDescription(props) {
                 <Icon name= "arrow-left" size= {18} color =  "gray"/> 
             </TouchableOpacity>
 
-            <View style = {styles.dataContainer}>
-
-                    <View style = {{margin: 10}}>
-                        <Text style = {styles.city}><Icon name ="map-marker" size = {23}/>  {selectedCityData.city}</Text>
-                    </View>
-
-                    <View style = {styles.currentMainData}>
-                        <View>
-                            <Text style = {{marginBottom: 3}}>Temperature</Text>
-                            <Text style = {styles.weatherValue}>{selectedCityData.currentMainData.temp}º</Text>
-                        </View>
-
-                        <View>
-                            <Text style = {{marginBottom: 3}}>Humidity</Text>
-                            <Text style = {styles.weatherValue}>{selectedCityData.currentMainData.humidity} %</Text>
-                        </View>
-
-                        <View>
-                            <Text style = {{marginBottom: 3}}>Sensation</Text>
-                            <Text style = {styles.weatherValue}>{selectedCityData.currentMainData.feels_like}º</Text>
-                        </View>
-
-                        <View>
-                            <Text style = {{marginBottom: 3}}>Pressure</Text>
-                            <Text style = {styles.weatherValue}>{selectedCityData.currentMainData.pressure}</Text>
-                        </View>
-                        
-                    </View>
-
-            </View>
+           <Description selectedCityData = {selectedCityData} />
 
             {
                 isBookmarked ? 
@@ -168,8 +140,6 @@ function CityDescription(props) {
                         <Text style = {styles.saveText}> <Icon name = "bookmark" size = {20}/> Save location</Text>
                     </TouchableOpacity >
             }
-
-
         </View>
     );
 }
