@@ -16,8 +16,13 @@ function CityDescription(props) {
     const [isBookmarked, setIsBookmarked] = useState(false);
 
     useEffect(() => {
-        getWeatherData();
-    }, []);
+        const unsubscribe = props.navigation.addListener('focus', () => {
+            getWeatherData();
+        });
+
+        return unsubscribe;
+
+    }, [props.navigation]);
 
     async function validateBookmark() {
 

@@ -30,6 +30,7 @@ function Home(props) {
     } 
     const [searchList, setSearchList ] = useState([]);
 
+
     useEffect(() => {
         getSearchList();
     }, [])
@@ -37,7 +38,8 @@ function Home(props) {
     async function getSearchList(){
         const snapshot = await firebase.firestore().collection('searchList').get();
         var result = snapshot.docs.map(doc => doc.data());
-        
+        setIsBookmarked(false);
+
         setTimeout(() => {
             setSearchList(result)
         });
@@ -80,6 +82,7 @@ function Home(props) {
         inputGoogle.current.setAddressText("");
 
         setLoadingModal(true);
+        setIsBookmarked(false);
 
         try {
 
@@ -156,17 +159,14 @@ function Home(props) {
         var cities = snapshot.docs.map(doc => doc.data());
 
         cities.map(c => {
-            console.log("compare =>", c, city)
+            console.log("compare =>", c.city, city)
             if(c.city == city){
                 setIsBookmarked(true)
-            } else {
-                setIsBookmarked(false)
-            }    
+            } 
         });
-
     }
 
-    console.log("location => ", locationData, searchList);
+    console.log("location => ", locationData, searchList, isBookmarked);
 
     return(
         <View style = {styles.container}>
@@ -228,6 +228,7 @@ function Home(props) {
                     : 
                         null
                 }
+
                 <LocationWeatherDesign locationData = {locationData} changeUnits = {changeUnits}/>
 
                 {
