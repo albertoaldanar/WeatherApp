@@ -5,7 +5,7 @@ import MapView, { PROVIDER_GOOGLE,  Marker, Polyline} from 'react-native-maps';
 import { Icon } from "react-native-vector-icons/FontAwesome";
 import { connect } from "react-redux";
 //local imports
-import API from '../../apis/weather/weatherApi';
+// import API from '../../apis/weather/weatherApi';
 
 function Map(props) {
 

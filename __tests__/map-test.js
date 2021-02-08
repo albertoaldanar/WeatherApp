@@ -4,76 +4,51 @@
 
 import 'react-native';
 import React from 'react';
-import { View, ScrollView, Text } from "react-native";
+import MapView, {Marker} from 'react-native-maps';
+import configureStore from 'redux-mock-store';
+import { Provider } from 'react-redux';
 import Map from "../src/pages/map";
-import Bookmark from '../src/pages/bookmarks/index';
+import Test from '../src/pages/test';
 
 import { shallow, mount, configure } from "enzyme";
 import Adapter from 'enzyme-adapter-react-16';
-import renderer from 'react-test-renderer'
+import renderer from 'react-test-renderer';
+import 'jsdom-global/register';
+
 
 configure({ adapter: new Adapter() });
+const mockStore = configureStore([]);
 
 let wrapper;
+let store;
 
-describe("Tests for Map", () => {
-    beforeAll(() => {
+describe('isOutsideDateRange', () => {
+  beforeEach(() => {
 
-        // const props ={
-        //     name: "Alberto "
-        // }
-        wrapper = shallow(<Map />)
-        
+    store = mockStore({
+        myState: 'sample text',
     });
 
-    it("login component mounts correctly", () => {
-        console.log("wrapper => ", wrapper);
-    })
+    const props = {
+        name: "Aberto"
+    }
 
-    // it("name state is 5", () => {
-    //     expect(wrapper.instance().state.name).toBeEqualTo(5);
-    // })
-})
+    wrapper = shallow( 
+        <Provider store={store}>
+            <Map /> 
+        </Provider>
+    )
+  });
 
-// describe("Test", () => {
+  it('Map component renders correctly', () => {
+    console.log("wrapper =>", wrapper.prop('children'))
+    expect(wrapper.prop('children')).toBeTruthy();
+  });
 
-//     beforeAll(() => {
+  it('Google maps loads correctly', () => {
+    expect(wrapper.find(MapView)).toHaveLength(1); 
+  });
 
-//         const props = {
-//             name: "Alberto", 
-//             secondExampleFunction: sinon.spy(),
-//         }
 
-//         wrapper = shallow(<Login {...props}/>);
-//     });
-
-//     it('renders login', () => {
-//         expect(wrapper.find(Text)).toHaveLength(2); 
-//         // const tree = renderer.create(<Login />).toJSON();
-//         // expect(tree).toMatchSnapshot();   
-//     });
-
-//     it('log', () => {
-
-//         console.log("wrapper =>", wrapper.instance());
-//         expect(wrapper.instance().props.name).toBeDefined();
-
-//     });
-
-//     it("Test example value ", () => {
-
-//         const value = 10;
-
-//         console.log("Instance  =>", wrapper.instance().state.exampleValue);
-
-//         expect( wrapper.instance().state.exampleValue).toEqual(10);
-
-//         // wrapper.instance().exampleFunction(6);
-
-//         // expect(wrapper.props().secondExampleFunction.getCall(0)).toBeDefined();
-
-//         // expect(wrapper.instance().state.exampleValue).toEqual(5);
-//         // expect(wrapper.instance().props.secondExampleFunction).toHaveBeenCalledTimes(1);
-//     })
-// });
-
+  
+});
